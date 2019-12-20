@@ -122,7 +122,7 @@ public class ModelBuilderPlugin extends BasePlugin implements ILombokPluginHook 
         innerClass.setVisibility(JavaVisibility.PUBLIC);
         innerClass.setStatic(true);
         if (topLevelClass.getSuperClass() != null) {
-            innerClass.setSuperClass(topLevelClass.getSuperClass().getShortName() + "." + BUILDER_CLASS_NAME);
+            innerClass.setSuperClass(topLevelClass.getSuperClass().get().getShortName() + "." + BUILDER_CLASS_NAME);
         }
 
         // 具体执行顺序 http://www.mybatis.org/generator/reference/pluggingIn.html

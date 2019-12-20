@@ -82,12 +82,11 @@ public class BatchInsertPlugin extends BasePlugin {
      * Java Client Methods 生成
      * 具体执行顺序 http://www.mybatis.org/generator/reference/pluggingIn.html
      * @param interfaze
-     * @param topLevelClass
      * @param introspectedTable
      * @return
      */
     @Override
-    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+    public boolean clientGenerated(Interface interfaze, IntrospectedTable introspectedTable) {
         // 1. batchInsert
         FullyQualifiedJavaType listType = FullyQualifiedJavaType.getNewListInstance();
         listType.addTypeArgument(introspectedTable.getRules().calculateAllFieldsClass());
@@ -141,7 +140,7 @@ public class BatchInsertPlugin extends BasePlugin {
         XmlElementGeneratorTools.useGeneratedKeys(batchInsertEle, introspectedTable);
 
         batchInsertEle.addElement(new TextElement("insert into " + introspectedTable.getFullyQualifiedTableNameAtRuntime()));
-        for (Element element : XmlElementGeneratorTools.generateKeys(ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns()), true)) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateKeys(ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns()), true)) {
             batchInsertEle.addElement(element);
         }
 
@@ -151,7 +150,7 @@ public class BatchInsertPlugin extends BasePlugin {
         foreachElement.addAttribute(new Attribute("item", "item"));
         foreachElement.addAttribute(new Attribute("separator", ","));
 
-        for (Element element : XmlElementGeneratorTools.generateValues(ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns()), "item.")) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateValues(ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns()), "item.")) {
             foreachElement.addElement(element);
         }
 
@@ -224,8 +223,8 @@ public class BatchInsertPlugin extends BasePlugin {
      * @param introspectedTable
      * @return
      */
-    private List<Element> generateSelectiveEnhancedEles(IntrospectedTable introspectedTable) {
-        List<Element> eles = new ArrayList<>();
+    private List<VisitableElement> generateSelectiveEnhancedEles(IntrospectedTable introspectedTable) {
+        List<VisitableElement> eles = new ArrayList<>();
 
         eles.add(new TextElement("insert into " + introspectedTable.getFullyQualifiedTableNameAtRuntime() + " ("));
 

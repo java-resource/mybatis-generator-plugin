@@ -237,7 +237,7 @@ public class LogicalDeletePlugin extends BasePlugin {
      * @return
      */
     @Override
-    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+    public boolean clientGenerated(Interface interfaze, IntrospectedTable introspectedTable) {
         if (this.logicalDeleteColumn != null) {
             // 1. 逻辑删除ByExample
             Method mLogicalDeleteByExample = JavaElementGeneratorTools.generateMethod(

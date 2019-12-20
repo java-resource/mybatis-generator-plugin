@@ -100,7 +100,7 @@ public class IntrospectedTableTools {
             columnName = columnName.replaceFirst(endingDelimiter + "$", "");
         }
 
-        return introspectedTable.getColumn(columnName);
+        return introspectedTable.getColumn(columnName).get();
     }
 
     /**

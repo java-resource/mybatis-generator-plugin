@@ -102,7 +102,7 @@ public class UpsertPlugin extends BasePlugin {
      * @return
      */
     @Override
-    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+    public boolean clientGenerated(Interface interfaze,  IntrospectedTable introspectedTable) {
         // ====================================== upsert ======================================
         Method mUpsert = JavaElementGeneratorTools.generateMethod(
                 METHOD_UPSERT,
@@ -243,7 +243,7 @@ public class UpsertPlugin extends BasePlugin {
             logger.debug("itfsw(存在即更新插件):" + interfaze.getType().getShortName() + "增加batchUpsertSelective方法。");
         }
 
-        return super.clientGenerated(interfaze, topLevelClass, introspectedTable);
+        return super.clientGenerated(interfaze,  introspectedTable);
     }
 
     /**
@@ -369,7 +369,7 @@ public class UpsertPlugin extends BasePlugin {
 
         // insert
         insertEle.addElement(new TextElement("insert into " + introspectedTable.getFullyQualifiedTableNameAtRuntime()));
-        for (Element element : XmlElementGeneratorTools.generateKeys(columns, true)) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateKeys(columns, true)) {
             insertEle.addElement(element);
         }
         insertEle.addElement(new TextElement("values"));
@@ -381,7 +381,7 @@ public class UpsertPlugin extends BasePlugin {
         foreachEle.addAttribute(new Attribute("item", "item"));
         foreachEle.addAttribute(new Attribute("separator", ","));
 
-        for (Element element : XmlElementGeneratorTools.generateValues(columns, "item.", true)) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateValues(columns, "item.", true)) {
             foreachEle.addElement(element);
         }
         insertEle.addElement(new TextElement("on duplicate key update "));
@@ -506,16 +506,16 @@ public class UpsertPlugin extends BasePlugin {
 
         // insert
         insertEle.addElement(new TextElement("insert into " + introspectedTable.getFullyQualifiedTableNameAtRuntime()));
-        for (Element element : XmlElementGeneratorTools.generateUpsertKeys(columns, null)) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateUpsertKeys(columns, null)) {
             insertEle.addElement(element);
         }
         insertEle.addElement(new TextElement("values"));
-        for (Element element : XmlElementGeneratorTools.generateUpsertValues(columns, null, true)) {
+        for (VisitableElement element : XmlElementGeneratorTools.generateUpsertValues(columns, null, true)) {
             insertEle.addElement(element);
         }
         insertEle.addElement(new TextElement("on duplicate key update "));
         // set
-        for (Element set : XmlElementGeneratorTools.generateUpsertSets(columns, null)) {
+        for (VisitableElement set : XmlElementGeneratorTools.generateUpsertSets(columns, null)) {
             insertEle.addElement(set);
         }
 
@@ -539,7 +539,7 @@ public class UpsertPlugin extends BasePlugin {
             updateEle.addElement(new TextElement("update " + introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime()));
             updateEle.addElement(new TextElement("set"));
             // set
-            for (Element set : XmlElementGeneratorTools.generateUpsertSets(columns, "record.")) {
+            for (VisitableElement set : XmlElementGeneratorTools.generateUpsertSets(columns, "record.")) {
                 updateEle.addElement(set);
             }
 
@@ -551,7 +551,7 @@ public class UpsertPlugin extends BasePlugin {
 
             // insert
             updateEle.addElement(new TextElement("insert into " + introspectedTable.getFullyQualifiedTableNameAtRuntime()));
-            for (Element element : XmlElementGeneratorTools.generateUpsertKeys(columns, "record.")) {
+            for (VisitableElement element : XmlElementGeneratorTools.generateUpsertKeys(columns, "record.")) {
                 updateEle.addElement(element);
             }
             this.generateExistsClause(introspectedTable, updateEle, XmlElementGeneratorTools.generateUpsertValues(columns, "record.", false));
@@ -568,10 +568,10 @@ public class UpsertPlugin extends BasePlugin {
      * @param element
      * @param values
      */
-    private void generateExistsClause(IntrospectedTable introspectedTable, XmlElement element, List<Element> values) {
+    private void generateExistsClause(IntrospectedTable introspectedTable, XmlElement element, List<VisitableElement> values) {
         element.addElement(new TextElement("select"));
 
-        for (Element value : values) {
+        for (VisitableElement value : values) {
             element.addElement(value);
         }
 

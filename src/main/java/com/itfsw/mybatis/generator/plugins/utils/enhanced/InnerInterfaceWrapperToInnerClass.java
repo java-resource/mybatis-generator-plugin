@@ -45,17 +45,6 @@ public class InnerInterfaceWrapperToInnerClass extends InnerClass{
         this.innerInterface = innerInterface;
     }
 
-    /**
-     * 重写获取Java内容方法，调用InnerInterface的实现
-     *
-     * @param indentLevel
-     * @param compilationUnit
-     * @return
-     */
-    @Override
-    public String getFormattedContent(int indentLevel, CompilationUnit compilationUnit) {
-        return this.innerInterface.getFormattedContent(indentLevel, compilationUnit);
-    }
 
     /**
      * Getter method for property <tt>innerInterface</tt>.

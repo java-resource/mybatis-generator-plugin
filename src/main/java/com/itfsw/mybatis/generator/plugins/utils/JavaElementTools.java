@@ -42,7 +42,7 @@ public class JavaElementTools {
         for (String javaDocLine : method.getJavaDocLines()) {
             dest.addJavaDocLine(javaDocLine);
         }
-        dest.setReturnType(method.getReturnType());
+        dest.setReturnType(method.getReturnType().get());
         for (Parameter parameter : method.getParameters()) {
             dest.addParameter(JavaElementTools.clone(parameter));
         }

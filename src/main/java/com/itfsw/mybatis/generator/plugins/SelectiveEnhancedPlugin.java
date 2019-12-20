@@ -166,7 +166,7 @@ public class SelectiveEnhancedPlugin extends BasePlugin implements IUpsertPlugin
 
         GeneratedKey gk = introspectedTable.getGeneratedKey();
         if (gk != null) {
-            IntrospectedColumn introspectedColumn = introspectedTable.getColumn(gk.getColumn());
+            IntrospectedColumn introspectedColumn = introspectedTable.getColumn(gk.getColumn()).get();
             // if the column is null, then it's a configuration error. The
             // warning has already been reported
             if (introspectedColumn != null) {

@@ -23,7 +23,8 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.Plugin;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.Document;
-import org.mybatis.generator.api.dom.xml.Element;
+
+import org.mybatis.generator.api.dom.xml.VisitableElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.config.Context;
 import org.slf4j.Logger;
@@ -105,7 +106,7 @@ public class HookAggregator implements IUpsertPluginHook,
     // ============================================= IIncrementsPluginHook ==============================================
 
     @Override
-    public List<Element> incrementSetElementGenerated(IntrospectedColumn introspectedColumn, String prefix, boolean hasComma) {
+    public List<VisitableElement> incrementSetElementGenerated(IntrospectedColumn introspectedColumn, String prefix, boolean hasComma) {
         if (this.getPlugins(IIncrementsPluginHook.class).isEmpty()) {
             return new ArrayList<>();
         } else {

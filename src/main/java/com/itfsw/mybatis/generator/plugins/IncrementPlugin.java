@@ -22,8 +22,8 @@ import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.Attribute;
-import org.mybatis.generator.api.dom.xml.Element;
 import org.mybatis.generator.api.dom.xml.TextElement;
+import org.mybatis.generator.api.dom.xml.VisitableElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.internal.util.JavaBeansUtil;
@@ -232,7 +232,7 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
             XmlElement choose = new XmlElement("choose");
 
             // 启用增量操作
-            String columnMap = (prefix != null ? prefix : "_parameter.") + FIELD_INC_MAP + "." + MyBatis3FormattingUtilities.escapeStringForMyBatis3(introspectedColumn.getActualColumnName());
+            String columnMap = (prefix != null ? prefix : "_parameter.") + FIELD_INC_MAP + "." + introspectedColumn.getActualColumnName();
             XmlElement whenIncEle = new XmlElement("when");
             whenIncEle.addAttribute(new Attribute("test", columnMap + " != null"));
             TextElement spec = new TextElement(
@@ -264,7 +264,7 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
             XmlElement choose = new XmlElement("choose");
 
             // 启用增量操作
-            String columnMap = (prefix != null ? prefix : "_parameter.") + FIELD_INC_MAP + "." + MyBatis3FormattingUtilities.escapeStringForMyBatis3(introspectedColumn.getActualColumnName());
+            String columnMap = (prefix != null ? prefix : "_parameter.") + FIELD_INC_MAP + "." + introspectedColumn.getActualColumnName();
             XmlElement whenIncEle = new XmlElement("when");
             whenIncEle.addAttribute(new Attribute("test", columnMap + " != null"));
             TextElement spec = new TextElement(
@@ -291,7 +291,6 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
      * 生成增量操作节点(SelectiveEnhancedPlugin)
      * @param columns
      * @return
-     * @see SelectiveEnhancedPlugin#generateSetsSelective(List, IntrospectedColumn)
      */
     @Override
     public List<XmlElement> generateIncrementSetForSelectiveEnhancedPlugin(List<IntrospectedColumn> columns) {
@@ -304,7 +303,7 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
                         XmlElement when = new XmlElement("when");
 
                         // 需要 inc 的列
-                        String columnMap = "record." + FIELD_INC_MAP + "." + MyBatis3FormattingUtilities.escapeStringForMyBatis3(incColumn.getActualColumnName());
+                        String columnMap = "record." + FIELD_INC_MAP + "." + incColumn.getActualColumnName();
 
                         when.addAttribute(new Attribute("test", "'" + column.getActualColumnName() + "'.toString() == column.value"));
                         when.addElement(new TextElement("${column.escapedColumnName} = ${column.escapedColumnName} "
@@ -470,7 +469,7 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
                 if (ifs.size() > 0) {
                     for (XmlElement xmlElement : ifs) {
                         // 下面为if的text节点
-                        List<Element> textEles = xmlElement.getElements();
+                        List<VisitableElement> textEles = xmlElement.getElements();
                         TextElement textEle = (TextElement) textEles.get(0);
                         String[] strs = textEle.getContent().split("=");
                         String columnName = strs[0].trim();
@@ -492,7 +491,7 @@ public class IncrementPlugin extends BasePlugin implements IIncrementPluginHook 
      */
     private void generatedWithoutSelective(XmlElement xmlElement, IntrospectedTable introspectedTable, boolean hasPrefix) {
         for (int i = 0; i < xmlElement.getElements().size(); i++) {
-            Element ele = xmlElement.getElements().get(i);
+            VisitableElement ele = xmlElement.getElements().get(i);
             // 找到text节点且格式为 set xx = xx 或者 xx = xx
             if (ele instanceof TextElement) {
                 String text = ((TextElement) ele).getContent().trim();

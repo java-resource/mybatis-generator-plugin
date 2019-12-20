@@ -80,7 +80,7 @@ public class MapperAnnotationPlugin extends BasePlugin {
      * @return
      */
     @Override
-    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+    public boolean clientGenerated(Interface interfaze,  IntrospectedTable introspectedTable) {
         for (String annotation : this.annotations) {
             if (annotation.equals("@Mapper")) {
                 if (introspectedTable.getTargetRuntime() == IntrospectedTable.TargetRuntime.MYBATIS3) {

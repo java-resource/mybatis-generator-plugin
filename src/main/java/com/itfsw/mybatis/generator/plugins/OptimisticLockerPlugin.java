@@ -68,7 +68,7 @@ public class OptimisticLockerPlugin extends BasePlugin implements IModelBuilderP
         // 读取并验证版本列
         String versionColumn = introspectedTable.getTableConfigurationProperty(PRO_VERSION_COLUMN);
         if (versionColumn != null) {
-            this.versionColumn = introspectedTable.getColumn(versionColumn);
+            this.versionColumn = introspectedTable.getColumn(versionColumn).get();
             if (this.versionColumn == null) {
                 warnings.add("itfsw(乐观锁插件):表" + introspectedTable.getFullyQualifiedTable() + "配置的版本列(" + introspectedTable.getTableConfigurationProperty(PRO_VERSION_COLUMN) + ")没有找到！");
             }
@@ -669,10 +669,10 @@ public class OptimisticLockerPlugin extends BasePlugin implements IModelBuilderP
         FormatTools.replaceComment(commentGenerator, withVersionEle);
 
         // 替换查询语句
-        Iterator<Element> elementIterator = withVersionEle.getElements().iterator();
+        Iterator<VisitableElement> elementIterator = withVersionEle.getElements().iterator();
         boolean flag = false;
         while (elementIterator.hasNext()) {
-            Element ele = elementIterator.next();
+            VisitableElement ele = elementIterator.next();
             if (ele instanceof TextElement && ((TextElement) ele).getContent().matches(".*where.*")) {
                 flag = true;
             }
@@ -763,9 +763,9 @@ public class OptimisticLockerPlugin extends BasePlugin implements IModelBuilderP
             // 版本自增
             updateEle.addElement(this.generateVersionSetEle(selective));
             // set 节点
-            List<Element> setsEles = XmlElementGeneratorTools.generateSets(columns, "record.");
+            List<VisitableElement> setsEles = XmlElementGeneratorTools.generateSets(columns, "record.");
             //  XmlElementGeneratorTools.generateSets, 因为传入参数不可能带IdentityAndGeneratedAlwaysColumn所以返回的是set列表而不可能是trim 元素
-            for (Element ele : setsEles) {
+            for (VisitableElement ele : setsEles) {
                 updateEle.addElement(ele);
             }
         }

@@ -25,8 +25,9 @@ import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.Attribute;
-import org.mybatis.generator.api.dom.xml.Element;
+
 import org.mybatis.generator.api.dom.xml.TextElement;
+import org.mybatis.generator.api.dom.xml.VisitableElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.codegen.mybatis3.MyBatis3FormattingUtilities;
 import org.mybatis.generator.internal.util.JavaBeansUtil;
@@ -254,7 +255,7 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
                 );
 
                 if (topLevelClass.getSuperClass() != null) {
-                    FullyQualifiedJavaType superBuilderCls = new FullyQualifiedJavaType(topLevelClass.getSuperClass().getShortName() + "Builder");
+                    FullyQualifiedJavaType superBuilderCls = new FullyQualifiedJavaType(topLevelClass.getSuperClass().get().getShortName() + "Builder");
                     superBuilderCls.addTypeArgument(new SpecTypeArgumentsFullyQualifiedJavaType("<C, B>"));
                     builderCls.setSuperClass(superBuilderCls);
                 }
@@ -461,8 +462,8 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
      * @return
      */
     @Override
-    public List<Element> incrementSetElementGenerated(IntrospectedColumn introspectedColumn, String prefix, boolean hasComma) {
-        List<Element> list = new ArrayList<>();
+    public List<VisitableElement> incrementSetElementGenerated(IntrospectedColumn introspectedColumn, String prefix, boolean hasComma) {
+        List<VisitableElement> list = new ArrayList<>();
 
         if (this.supportIncrement(introspectedColumn)) {
             // 1. column = 节点
@@ -477,12 +478,12 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
             when.addAttribute(new Attribute(
                     "test",
                     (prefix != null ? prefix : "_parameter.") + IncrementsPlugin.METHOD_INC_CHECK
-                            + "('" + MyBatis3FormattingUtilities.escapeStringForMyBatis3(introspectedColumn.getActualColumnName()) + "')"
+                            + "('" + introspectedColumn.getActualColumnName() + "')"
             ));
             TextElement spec = new TextElement(
                     MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn)
                             + " ${" + (prefix != null ? prefix : "_parameter.")
-                            + IncrementsPlugin.METHOD_GET_INC_MAP + "()." + MyBatis3FormattingUtilities.escapeStringForMyBatis3(introspectedColumn.getActualColumnName()) + ".value} "
+                            + IncrementsPlugin.METHOD_GET_INC_MAP + "()." + introspectedColumn.getActualColumnName() + ".value} "
                             + MyBatis3FormattingUtilities.getParameterClause(introspectedColumn, prefix));
             when.addElement(spec);
             choose.addElement(when);
@@ -647,13 +648,13 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
                 if (ifs.size() > 0) {
                     for (XmlElement xmlElement : ifs) {
                         // 下面为if的text节点
-                        List<Element> textEles = xmlElement.getElements();
+                        List<VisitableElement> textEles = xmlElement.getElements();
                         TextElement textEle = (TextElement) textEles.get(0);
                         String[] strs = textEle.getContent().split("=");
                         String columnName = strs[0].trim();
                         IntrospectedColumn introspectedColumn = IntrospectedTableTools.safeGetColumn(introspectedTable, columnName);
                         // 查找是否需要进行增量操作
-                        List<Element> incrementEles = PluginTools.getHook(IIncrementsPluginHook.class).incrementSetElementGenerated(introspectedColumn, hasPrefix ? "record." : null, true);
+                        List<VisitableElement> incrementEles = PluginTools.getHook(IIncrementsPluginHook.class).incrementSetElementGenerated(introspectedColumn, hasPrefix ? "record." : null, true);
                         if (!incrementEles.isEmpty()) {
                             xmlElement.getElements().clear();
                             xmlElement.getElements().addAll(incrementEles);
@@ -672,8 +673,8 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
      */
     private void generatedWithoutSelective(XmlElement xmlElement, IntrospectedTable introspectedTable, boolean hasPrefix) {
         if (this.support()) {
-            List<Element> newEles = new ArrayList<>();
-            for (Element ele : xmlElement.getElements()) {
+            List<VisitableElement> newEles = new ArrayList<>();
+            for (VisitableElement ele : xmlElement.getElements()) {
                 // 找到text节点且格式为 set xx = xx 或者 xx = xx
                 if (ele instanceof TextElement) {
                     String text = ((TextElement) ele).getContent().trim();
@@ -683,7 +684,7 @@ public class IncrementsPlugin extends BasePlugin implements IModelBuilderPluginH
                         String columnName = text.split("=")[0].trim();
                         IntrospectedColumn introspectedColumn = IntrospectedTableTools.safeGetColumn(introspectedTable, columnName);
                         // 查找判断是否需要进行节点替换
-                        List<Element> incrementEles = PluginTools.getHook(IIncrementsPluginHook.class).incrementSetElementGenerated(introspectedColumn, hasPrefix ? "record." : null, text.endsWith(","));
+                        List<VisitableElement> incrementEles = PluginTools.getHook(IIncrementsPluginHook.class).incrementSetElementGenerated(introspectedColumn, hasPrefix ? "record." : null, text.endsWith(","));
                         if (!incrementEles.isEmpty()) {
                             newEles.addAll(incrementEles);
 

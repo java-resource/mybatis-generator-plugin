@@ -17,13 +17,11 @@
 package com.itfsw.mybatis.generator.plugins.utils.hook;
 
 import com.itfsw.mybatis.generator.plugins.utils.BasePlugin;
-import com.itfsw.mybatis.generator.plugins.utils.BeanUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.Plugin;
 import org.mybatis.generator.api.dom.java.*;
 import org.mybatis.generator.api.dom.xml.Document;
-
 import org.mybatis.generator.api.dom.xml.VisitableElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.config.Context;
@@ -35,8 +33,9 @@ import java.util.List;
 
 /**
  * ---------------------------------------------------------------------------
- *
+ * <p>
  * ---------------------------------------------------------------------------
+ *
  * @author: hewei
  * @time:2018/4/27 11:33
  * ---------------------------------------------------------------------------
@@ -65,6 +64,7 @@ public class HookAggregator implements IUpsertPluginHook,
 
     /**
      * Getter method for property <tt>instance</tt>.
+     *
      * @return property value of instance
      * @author hewei
      */
@@ -74,6 +74,7 @@ public class HookAggregator implements IUpsertPluginHook,
 
     /**
      * Setter method for property <tt>context</tt>.
+     *
      * @param context value to be assigned to property context
      * @author hewei
      */
@@ -83,15 +84,15 @@ public class HookAggregator implements IUpsertPluginHook,
 
     /**
      * 获取插件
-     * @param clazz
-     * @param <T>
-     * @return
      */
     private <T> List<T> getPlugins(Class<T> clazz) {
         List list = new ArrayList();
         // 反射获取插件列表，不能用单例去弄，不然因为类释放的问题而导致测试用例出问题
         try {
-            List<Plugin> plugins = (List<Plugin>) BeanUtils.getProperty(this.context.getPlugins(), "plugins");
+            Plugin contextPlugins = this.context.getPlugins();
+            java.lang.reflect.Field field = contextPlugins.getClass().getSuperclass().getDeclaredField("plugins");
+            field.setAccessible(true);
+            List<Plugin> plugins = (List<Plugin>) field.get(contextPlugins);
             for (Plugin plugin : plugins) {
                 if (clazz.isInstance(plugin)) {
                     list.add(plugin);
